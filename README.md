@@ -10,7 +10,7 @@ To create a new DHT swarm, just call DHT() with the host and port that you will 
 
 Example - A two-node DHT:
 
-```
+```python
 from kad import DHT
 host1, port1 = 'localhost', 3000
 dht1 = DHT(host1, port1)

@@ -144,9 +144,16 @@ class DHT(object):
 				
 
 	def get_sync (self, key, handler):
-		handler (self[key])
+		try:
+			d = self[key]
+			#print ('get',key,d)
+		except:
+			d = None
+
+		handler (d)
 
 	def get (self, key, handler):
+		#print ('get',key)
 		t = threading.Thread(target=self.get_sync, args=(key, handler))		
 		t.start ()	
 
@@ -160,6 +167,7 @@ class DHT(object):
 		raise KeyError
 		
 	def __setitem__(self, key, value):
+		#print ('set',key,value)
 		hashed_key = hash_function(key)
 		nearest_nodes = self.iterative_find_nodes(hashed_key)
 		if not nearest_nodes:
