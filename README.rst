@@ -1,7 +1,7 @@
-pydht
+kad.py
 ==========
 
-Python implementation of the Kademlia DHT data store.
+Python3 implementation of the Kademlia DHT data store.
 
 Useful for distributing a key-value store in a decentralized manner.
 
@@ -12,7 +12,7 @@ Example - A two-node DHT:
 
 ::
 
-    >>> from pydht import DHT
+    >>> from kad import DHT
     >>> host1, port1 = 'localhost', 3000
     >>> dht1 = DHT(host1, port1)
     >>> 
