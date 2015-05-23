@@ -1,3 +1,4 @@
+import time
 from kad import DHT
 
 
@@ -35,7 +36,18 @@ dht1 = DHT(host1, port1)
 host2, port2 = 'localhost', 3001
 dht2 = DHT(host2, port2, bootstrap_nodes=[(host1,port1)])
 
+host3, port3 = 'localhost', 3002
+dht3 = DHT(host3, port3, bootstrap_nodes=[(host2,port2)])
+
 dht1["my_key"] = [u"My", u"json-serializable", u"Object"]
 
 dht2.get ("my_key", lambda d: print ('Find:',d))
+dht3.get ("my_key", lambda d: print ('Find:',d))
+
 #print (dht2["my_key"])
+
+print (dht1.peers())
+print (dht2.peers())
+print (dht3.peers())
+
+

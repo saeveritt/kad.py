@@ -15,7 +15,6 @@ id_bits = 128
 iteration_sleep = 1
 
 class DHTRequestHandler(socketserver.BaseRequestHandler):
-
 	def handle(self):
 		try:
 			message = json.loads(self.request[0].decode ('utf-8').strip())
@@ -104,7 +103,8 @@ class DHT(object):
 		self.server_thread = threading.Thread(target=self.server.serve_forever)
 		self.server_thread.daemon = True
 		self.server_thread.start()
-		self.bootstrap(bootstrap_nodes)
+		self.bootstrap (bootstrap_nodes)
+
 	
 	def iterative_find_nodes(self, key, boot_peer=None):
 		shortlist = Shortlist(k, key)
@@ -136,27 +136,38 @@ class DHT(object):
 				peer.find_value(key, rpc_id, socket=self.server.socket, peer_id=self.peer.id) #####
 			time.sleep(iteration_sleep)
 		return shortlist.completion_result()
-			
+
+
+
+	# Return the list of connected peers
+	def peers (self):
+		return self.buckets.to_list ()
+
+	# Boostrap the network with a list of bootstrap nodes			
 	def bootstrap(self, bootstrap_nodes):
 		for bnode in bootstrap_nodes:
 			boot_peer = Peer(bnode[0], bnode[1], 0)
 			self.iterative_find_nodes(self.peer.id, boot_peer=boot_peer)
 				
 
+	# Get a value in a sync way, calling an handler
 	def get_sync (self, key, handler):
 		try:
 			d = self[key]
-			#print ('get',key,d)
 		except:
 			d = None
 
 		handler (d)
 
+
+	# Get a value in async way
 	def get (self, key, handler):
 		#print ('get',key)
 		t = threading.Thread(target=self.get_sync, args=(key, handler))		
 		t.start ()	
 
+
+	# Operator []
 	def __getitem__(self, key):
 		hashed_key = hash_function(key)
 		if hashed_key in self.data:
@@ -166,6 +177,7 @@ class DHT(object):
 			return result
 		raise KeyError
 		
+	# Operator []=
 	def __setitem__(self, key, value):
 		#print ('set',key,value)
 		hashed_key = hash_function(key)
