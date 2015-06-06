@@ -91,11 +91,13 @@ class DHTServer(socketserver.ThreadingMixIn, socketserver.UDPServer):
 		self.send_lock = threading.Lock()
 
 class DHT(object):
-	def __init__(self, host, port, id=None, bootstrap_nodes=[]):
+	def __init__(self, host, port, id=None, bootstrap_nodes=[], storage={}, hash_function=lambda d: d):
 		if not id:
 			id = random_id()
+		self.storage = storage
+		self.hash_function = hash_function
 		self.peer = Peer(host, port, id)
-		self.data = {}
+		self.data = storage
 		self.buckets = BucketSet(k, id_bits, self.peer.id)
 		self.rpc_ids = {} # should probably have a lock for this
 		self.server = DHTServer(self.peer.address(), DHTRequestHandler)
@@ -169,7 +171,7 @@ class DHT(object):
 
 	# Operator []
 	def __getitem__(self, key):
-		hashed_key = hash_function(key)
+		hashed_key = self.hash_function (key)
 		if hashed_key in self.data:
 			return self.data[hashed_key]
 		result = self.iterative_find_value(hashed_key)
@@ -180,7 +182,7 @@ class DHT(object):
 	# Operator []=
 	def __setitem__(self, key, value):
 		#print ('set',key,value)
-		hashed_key = hash_function(key)
+		hashed_key = self.hash_function (key)
 		nearest_nodes = self.iterative_find_nodes(hashed_key)
 		if not nearest_nodes:
 			self.data[hashed_key] = value
