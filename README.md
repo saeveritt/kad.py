@@ -1,5 +1,4 @@
-kad.py
-==========
+# kad.py
 
 Python3 implementation of the Kademlia DHT data store.
 
@@ -8,9 +7,7 @@ Useful for distributing a key-value store in a decentralized manner.
 To create a new DHT swarm, just call DHT() with the host and port that you will listen on. To join an existing DHT swarm, also provide bootstrap host and port numbers of any existing node.  The nodes will discover the rest of the swarm as appropriate during usage.
 
 
-Example: A two-node DHT
-==
-
+## Example: A two-node DHT
 
 ```python
 from kad import DHT
@@ -26,8 +23,7 @@ dht2.get ("my_key", lambda data: print (data)) # threaded get
 ```
 
 
-Example: Persistent storage
-==
+## Example: Persistent storage
 
 ```python
 from kad import DHT
@@ -38,8 +34,7 @@ dht1 = DHT(host1, port1, storage=shelve.open ('sto.dat'))
 ```
 
 
-Example: Custom hash function
-==
+## Example: Custom hash function
 
 ```python
 from kad import DHT
