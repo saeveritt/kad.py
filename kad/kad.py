@@ -92,13 +92,13 @@ class DHTServer(socketserver.ThreadingMixIn, socketserver.UDPServer):
 		self.send_lock = threading.Lock()
 
 class DHT(object):
-	def __init__(self, host, port, id=None, bootstrap_nodes=[], storage={}, hash_function=hashing.hash_function):
+	def __init__(self, host, port, id=None, bootstrap_nodes=[], storage={}):
 		if not id:
 			id = random_id()
 		self.storage = storage
-		self.hash_function = hash_function
+		self.hash_function = hashing.hash_function
 		self.peer = Peer(host, port, id)
-		self.data = storage
+		self.data = self.storage
 		self.buckets = BucketSet(k, id_bits, self.peer.id)
 		self.rpc_ids = {} # should probably have a lock for this
 		self.server = DHTServer(self.peer.address(), DHTRequestHandler)
