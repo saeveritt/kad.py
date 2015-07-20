@@ -8,6 +8,7 @@ from .bucketset import BucketSet
 from .hashing import hash_function, random_id
 from .peer import Peer
 from .shortlist import Shortlist
+from . import hashing
 
 k = 20
 alpha = 3
@@ -91,7 +92,7 @@ class DHTServer(socketserver.ThreadingMixIn, socketserver.UDPServer):
 		self.send_lock = threading.Lock()
 
 class DHT(object):
-	def __init__(self, host, port, id=None, bootstrap_nodes=[], storage={}, hash_function=lambda d: d):
+	def __init__(self, host, port, id=None, bootstrap_nodes=[], storage={}, hash_function=hashing.hash_function):
 		if not id:
 			id = random_id()
 		self.storage = storage
