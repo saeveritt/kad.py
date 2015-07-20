@@ -7,6 +7,7 @@ import time
 from .bucketset import BucketSet
 from .hashing import hash_function, random_id
 from .peer import Peer
+from .storage import Shelve
 from .shortlist import Shortlist
 from . import hashing
 
