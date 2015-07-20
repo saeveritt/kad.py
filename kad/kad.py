@@ -166,7 +166,7 @@ class DHT(object):
 
 	# Get a value in async way
 	def get (self, key, handler):
-		#print ('get',key)
+		#print ('dht.get',key)
 		t = threading.Thread(target=self.get_sync, args=(key, handler))		
 		t.start ()	
 
@@ -183,8 +183,8 @@ class DHT(object):
 		
 	# Operator []=
 	def __setitem__(self, key, value):
-		#print ('set',key,value)
 		hashed_key = self.hash_function (key)
+		#print ('dht.set',key,value,hashed_key)
 		nearest_nodes = self.iterative_find_nodes(hashed_key)
 		if not nearest_nodes:
 			self.data[hashed_key] = value
