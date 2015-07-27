@@ -109,6 +109,9 @@ class DHT(object):
 		self.server_thread.start()
 		self.bootstrap (bootstrap_nodes)
 
+	def identity (self):
+		return self.peer.id
+
 	
 	def iterative_find_nodes(self, key, boot_peer=None):
 		shortlist = Shortlist(k, key)
