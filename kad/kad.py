@@ -93,10 +93,11 @@ class DHTServer(socketserver.ThreadingMixIn, socketserver.UDPServer):
 		self.send_lock = threading.Lock()
 
 class DHT(object):
-	def __init__(self, host, port, id=None, bootstrap_nodes=[], storage={}):
+	def __init__(self, host, port, id=None, bootstrap_nodes=[], storage={}, info={}):
 		if not id:
 			id = random_id()
 		self.storage = storage
+		self.info = info
 		self.hash_function = hashing.hash_function
 		self.peer = Peer(host, port, id)
 		self.data = self.storage
