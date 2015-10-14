@@ -41,13 +41,15 @@ class DHTRequestHandler(socketserver.BaseRequestHandler):
 			pass
 		client_host, client_port = self.client_address
 		peer_id = message["peer_id"]
-		new_peer = Peer(client_host, client_port, peer_id)
+		peer_info = message["peer_info"]
+		new_peer = Peer(client_host, client_port, peer_id, peer_info)
 		self.server.dht.buckets.insert(new_peer)
 
 	def handle_ping(self, message):
 		client_host, client_port = self.client_address
 		id = message["peer_id"]
-		peer = Peer(client_host, client_port, id)
+		info = message["peer_info"]
+		peer = Peer(client_host, client_port, id, info)
 		peer.pong(socket=self.server.socket, peer_id=self.server.dht.peer.id, lock=self.server.send_lock)
 		
 	def handle_pong(self, message):
@@ -56,18 +58,19 @@ class DHTRequestHandler(socketserver.BaseRequestHandler):
 	def handle_find(self, message, find_value=False):
 		key = message["id"]
 		id = message["peer_id"]
+		info = message["peer_info"]
 		client_host, client_port = self.client_address
-		peer = Peer(client_host, client_port, id)
+		peer = Peer(client_host, client_port, id, info)
 		response_socket = self.request[1]
 		if find_value and (key in self.server.dht.data):
 			value = self.server.dht.data[key]
-			peer.found_value(id, value, message["rpc_id"], socket=response_socket, peer_id=self.server.dht.peer.id, lock=self.server.send_lock)
+			peer.found_value(id, value, message["rpc_id"], socket=response_socket, peer_id=self.server.dht.peer.id, peer_info=self.server.dht.peer.info, lock=self.server.send_lock)
 		else:
 			nearest_nodes = self.server.dht.buckets.nearest_nodes(id)
 			if not nearest_nodes:
 				nearest_nodes.append(self.server.dht.peer)
 			nearest_nodes = [nearest_peer.astriple() for nearest_peer in nearest_nodes]
-			peer.found_nodes(id, nearest_nodes, message["rpc_id"], socket=response_socket, peer_id=self.server.dht.peer.id, lock=self.server.send_lock)
+			peer.found_nodes(id, nearest_nodes, message["rpc_id"], socket=response_socket, peer_id=self.server.dht.peer.id, peer_info=self.server.dht.peer.info, lock=self.server.send_lock)
 
 	def handle_found_nodes(self, message):
 		rpc_id = message["rpc_id"]
@@ -99,7 +102,7 @@ class DHT(object):
 		self.storage = storage
 		self.info = info
 		self.hash_function = hashing.hash_function
-		self.peer = Peer(host, port, id)
+		self.peer = Peer(host, port, id, info)
 		self.data = self.storage
 		self.buckets = BucketSet(k, id_bits, self.peer.id)
 		self.rpc_ids = {} # should probably have a lock for this
@@ -120,14 +123,14 @@ class DHT(object):
 		if boot_peer:
 			rpc_id = random.getrandbits(id_bits)
 			self.rpc_ids[rpc_id] = shortlist
-			boot_peer.find_node(key, rpc_id, socket=self.server.socket, peer_id=self.peer.id)
+			boot_peer.find_node(key, rpc_id, socket=self.server.socket, peer_id=self.peer.id, peer_info=self.peer.info)
 		while (not shortlist.complete()) or boot_peer:
 			nearest_nodes = shortlist.get_next_iteration(alpha)
 			for peer in nearest_nodes:
 				shortlist.mark(peer)
 				rpc_id = random.getrandbits(id_bits)
 				self.rpc_ids[rpc_id] = shortlist
-				peer.find_node(key, rpc_id, socket=self.server.socket, peer_id=self.peer.id) ######
+				peer.find_node(key, rpc_id, socket=self.server.socket, peer_id=self.peer.id, peer_info=self.info) ######
 			time.sleep(iteration_sleep)
 			boot_peer = None
 		return shortlist.results()
@@ -141,7 +144,7 @@ class DHT(object):
 				shortlist.mark(peer)
 				rpc_id = random.getrandbits(id_bits)
 				self.rpc_ids[rpc_id] = shortlist
-				peer.find_value(key, rpc_id, socket=self.server.socket, peer_id=self.peer.id) #####
+				peer.find_value(key, rpc_id, socket=self.server.socket, peer_id=self.peer.id, peer_info=self.info) #####
 			time.sleep(iteration_sleep)
 		return shortlist.completion_result()
 
@@ -149,12 +152,12 @@ class DHT(object):
 
 	# Return the list of connected peers
 	def peers (self):
-		return self.buckets.to_list ()
+		return self.buckets.to_dict ()
 
 	# Boostrap the network with a list of bootstrap nodes			
 	def bootstrap(self, bootstrap_nodes):
 		for bnode in bootstrap_nodes:
-			boot_peer = Peer(bnode[0], bnode[1], 0)
+			boot_peer = Peer(bnode[0], bnode[1], "", "")
 			self.iterative_find_nodes(self.peer.id, boot_peer=boot_peer)
 				
 

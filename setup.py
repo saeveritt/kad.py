@@ -12,8 +12,8 @@ setup(
     version=kad.__version__,
     description='Python3 DHT Implementation',
     long_description=readme,
-    author='Isaac Zafuta, Davide Gessa',
-    author_email='isaac@zafuta.com, gessadavide@gmail.com',
+    author='Davide Gessa, Isaac Zafuta',
+    author_email='gessadavide@gmail.com, isaac@zafuta.com',
     url='https://github.com/dakk/kad.py',
     license=license,
     packages=find_packages(exclude=('tests', 'docs'))
