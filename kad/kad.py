@@ -155,10 +155,15 @@ class DHT(object):
 		return self.buckets.to_dict ()
 
 	# Boostrap the network with a list of bootstrap nodes			
-	def bootstrap(self, bootstrap_nodes):
+	def bootstrap(self, bootstrap_nodes = []):
 		for bnode in bootstrap_nodes:
 			boot_peer = Peer(bnode[0], bnode[1], "", "")
 			self.iterative_find_nodes(self.peer.id, boot_peer=boot_peer)
+		
+		if len (bootstrap_nodes) == 0:
+			for bnode in self.buckets.to_list ():
+				self.iterative_find_nodes(self.peer.id, boot_peer=Peer (bnode[0], bnode[1], bnode[2], bnode[3]))
+				
 				
 
 	# Get a value in a sync way, calling an handler
