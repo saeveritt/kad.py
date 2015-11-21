@@ -95,6 +95,7 @@ class DHTServer(socketserver.ThreadingMixIn, socketserver.UDPServer):
 		socketserver.UDPServer.__init__(self, host_address, handler_cls)
 		self.send_lock = threading.Lock()
 
+		
 class DHT(object):
 	def __init__(self, host, port, id=None, bootstrap_nodes=[], storage={}, info={}):
 		if not id:
@@ -182,6 +183,10 @@ class DHT(object):
 		t = threading.Thread(target=self.get_sync, args=(key, handler))		
 		t.start ()	
 
+
+	# Iterator
+	def __iter__(self):
+		return self.data
 
 	# Operator []
 	def __getitem__(self, key):
