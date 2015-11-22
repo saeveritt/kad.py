@@ -15,7 +15,7 @@ from kad import DHT
 host1, port1 = 'localhost', 3000
 dht1 = DHT(host1, port1)
 host2, port2 = 'localhost', 3001
-dht2 = DHT(host2, port2, bootstrap_nodes=[(host1, port1)])
+dht2 = DHT(host2, port2, seeds=[(host1, port1)])
 dht1["my_key"] = [u"My", u"json-serializable", u"Object"]
 
 print (dht2["my_key"])	# blocking get
@@ -46,4 +46,41 @@ from kad import DHT
 
 host, port = 'localhost', 3000
 dht = DHT(host, port, hash_function=lambda d: d[0:4])
+```
+
+
+
+## Example: Custom request handler
+
+You can extend the default DHTRequestHandler to intercept any kind of messages.
+
+```python
+from kad import *
+
+class CustomRequestHandler (kad.DHTRequestHandler):
+    def handle_store(self, message):
+        print (message['value'])
+        return super (CustomRequestHandler, self).handle_store (message)
+
+    
+d = DHT ('localhost', 3030, requesthandler=CustomRequestHandler)
+    
+d['ciao'] = {'hola': 12}
+```
+
+
+## Example: Iterate over DHT keys
+
+You can use the DHT object as iterator for stored keys.
+
+```python
+from kad import DHT
+
+d = DHT ('localhost', 3100)
+
+d['ciao'] = 'mondo'
+d['hello'] = 'world'
+
+for key in d:
+    print (key, d[key])
 ```
