@@ -97,7 +97,7 @@ class DHTServer(socketserver.ThreadingMixIn, socketserver.UDPServer):
 
 		
 class DHT(object):
-	def __init__(self, host, port, id=None, bootstrap_nodes=[], storage={}, info={}):
+	def __init__(self, host, port, id=None, seeds=[], storage={}, info={}, requesthandler=DHTRequestHandler):
 		if not id:
 			id = random_id()
 		self.storage = storage
@@ -107,12 +107,12 @@ class DHT(object):
 		self.data = self.storage
 		self.buckets = BucketSet(k, id_bits, self.peer.id)
 		self.rpc_ids = {} # should probably have a lock for this
-		self.server = DHTServer(self.peer.address(), DHTRequestHandler)
+		self.server = DHTServer (self.peer.address(), requesthandler)
 		self.server.dht = self
 		self.server_thread = threading.Thread(target=self.server.serve_forever)
 		self.server_thread.daemon = True
 		self.server_thread.start()
-		self.bootstrap (bootstrap_nodes)
+		self.bootstrap (seeds)
 
 	def identity (self):
 		return self.peer.id
@@ -185,12 +185,16 @@ class DHT(object):
 
 
 	# Iterator
-	def __iter__(self):
-		return self.data
+	def __iter__ (self):
+		return self.data.__iter__ ()
 
 	# Operator []
 	def __getitem__(self, key):
-		hashed_key = self.hash_function (key)
+		if type (key) == int:
+			hashed_key = key
+		else:
+			hashed_key = self.hash_function (key)
+			
 		if hashed_key in self.data:
 			return self.data[hashed_key]
 		result = self.iterative_find_value(hashed_key)
