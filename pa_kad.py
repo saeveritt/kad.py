@@ -1,5 +1,4 @@
 from kad import DHT
-from time import sleep
 from hashlib import sha256
 from peerassets import proven_txid, verify_owner
 from operator import xor
