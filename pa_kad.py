@@ -1,6 +1,4 @@
 from kad import DHT
-from json import loads
-from urllib.request import urlopen
 from time import sleep
 from subprocess import Popen, PIPE
 from hashlib import sha256
