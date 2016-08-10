@@ -35,4 +35,5 @@ dht = DHT(host2,port2,id=nodeid,seeds=[(host1,port1)])
 
 #append some data to dht
 key = sha256('some key' + 'salt').hexdigest()
-dht[key] = 'unka unka'
+#include transactionid for verification
+dht[key] = txid + 'unka unka'
