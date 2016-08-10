@@ -19,7 +19,6 @@ qnt =  200
 test = verify_owner(address,issuer, name, qnt)
 
 if test == True:
-        # Creating transaction by sending peerasset to newly created address and returns txid
         # proven_txid() returns the transaction id stating peerasset ownership
         # For an entry to be valid there must be X amount of Y peerasset in address. This transaction will be signed by owner. 
         txid = proven_txid(address,'issuer:%s,name:%s,qnt:%s'%(issuer,name,qnt))
